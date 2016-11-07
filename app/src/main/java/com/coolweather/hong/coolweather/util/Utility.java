@@ -1,6 +1,7 @@
 package com.coolweather.hong.coolweather.util;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.coolweather.hong.coolweather.db.CoolWeatherDB;
 import com.coolweather.hong.coolweather.model.City;
@@ -17,9 +18,11 @@ public class Utility {
      */
     public synchronized static boolean handleProvincesResponse(CoolWeatherDB coolWeatherDB, String response){
         if (!TextUtils.isEmpty(response)){
+            Log.i("handleProvincesResponse",response);
             String [] allProvince = response.split(",");
             if (allProvince!=null&&allProvince.length>0){
                 for (String p : allProvince){
+                    Log.i("handleProvincesResponse",p);
                     String [] array = p.split("\\|");
                     Province province = new Province();
                     province.setProvinceCode(array[0]);
@@ -67,6 +70,7 @@ public class Utility {
                     county.setCountyCode(array[0]);
                     county.setCountyName(array[1]);
                     county.setCityId(cityId);
+                    coolWeatherDB.saveCounty(county);
                 }
                 return true;
             }

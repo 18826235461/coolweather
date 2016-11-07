@@ -19,13 +19,14 @@ public class HttpUtil {
             @Override
             public void run() {
                 HttpURLConnection connection = null;
+                InputStream in = null;
                 try {
                     URL url = new URL(address);
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setConnectTimeout(8000);
                     connection.setReadTimeout(8000);
-                    InputStream in = connection.getInputStream();
+                    in = connection.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     StringBuilder response = new StringBuilder();
                     String line;
@@ -37,7 +38,15 @@ public class HttpUtil {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    listener.onError(e);
                 }finally {
+                    if (in != null){
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     if (connection!=null){
                         connection.disconnect();
                     }
