@@ -40,13 +40,6 @@ public class HttpUtil {
                     e.printStackTrace();
                     listener.onError(e);
                 }finally {
-                    if (in != null){
-                        try {
-                            in.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
                     if (connection!=null){
                         connection.disconnect();
                     }
