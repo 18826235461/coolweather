@@ -1,5 +1,6 @@
 package com.coolweather.hong.coolweather.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,11 +19,13 @@ import com.coolweather.hong.coolweather.util.HttpCallBackListener;
 import com.coolweather.hong.coolweather.util.HttpUtil;
 import com.coolweather.hong.coolweather.util.Utility;
 
+import java.io.BufferedReader;
+
 /**
  * Created by 11603 on 2016/11/10.
  */
 
-public class WeatherActivity extends AppCompatActivity {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener{
     private LinearLayout weatherInfoLayout;
     //用于显示城市名
     private TextView cityNameText;
@@ -36,6 +40,11 @@ public class WeatherActivity extends AppCompatActivity {
     //用于显示当前日期
     private TextView currentDateText;
 
+    //更换显示城市按钮
+    private Button switch_city;
+    //手动刷新天气
+    private Button refresh_weather;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +57,10 @@ public class WeatherActivity extends AppCompatActivity {
         this.temp1Text= (TextView) findViewById(R.id.temp1);
         this.temp2Text= (TextView) findViewById(R.id.temp2);
         this.currentDateText= (TextView) findViewById(R.id.current_date);
+        this.switch_city = (Button) findViewById(R.id.switch_city);
+        this.refresh_weather = (Button) findViewById(R.id.refresh_weather);
+        this.switch_city.setOnClickListener(this);
+        this.refresh_weather.setOnClickListener(this);
         String countyCode = getIntent().getStringExtra("county_code");
         if (!TextUtils.isEmpty(countyCode)){
             //有县级代号就去查询天气
@@ -58,6 +71,29 @@ public class WeatherActivity extends AppCompatActivity {
         }else {
             //没有就直接显示天气
             showWeather();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.switch_city:
+                Intent intent = new Intent(WeatherActivity.this, ChooseAreaActivity.class);
+                intent.putExtra("from_weather_activity",true);
+                this.startActivity(intent);
+                this.finish();
+                break;
+            case R.id.refresh_weather:
+                publishText.setText("同步中...");
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                String weather_code = sharedPreferences.getString("weather_code", "");
+                if (!TextUtils.isEmpty(weather_code)){
+                    queryWeatherInfo(weather_code);
+                }
+                break;
+            default:
+                break;
         }
     }
 
